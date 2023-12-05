@@ -1,8 +1,11 @@
 const contentContainer = document.querySelector('#content-container')
 const cartCounterLabel = document.querySelector('#cart-counter-label')
+const cartModalBody = document.querySelector('#cartModalBody');
+const cartModal = new bootstrap.Modal(document.getElementById('cartModal'));
 
 let cartCounter = 0
 let cartPrice = 0
+let cartItems = [];
 
 const btnClickHandler = (e) => {
     const target = e.target
@@ -12,11 +15,18 @@ const btnClickHandler = (e) => {
     if (typeof target !== 'object') return
     if (!target.matches('.item-actions__cart')) return
 
+    const itemTitle = target.closest('.item-wrapper').querySelector('.item-title').textContent;
+    const itemPrice = getMockData(target);
+
+    const itemData = { title: itemTitle, price: itemPrice };
+
     incrementCounter(cartCounterLabel, ++cartCounter)
     cartPrice = getPrice(target, cartPrice)
     restoreHTML = target.innerHTML
     target.innerHTML = `Added ${cartPrice} $`
     disableControls(target, contentContainer, btnClickHandler)
+
+    cartItems.push(itemData);
 
     setTimeout(() => {
         target.innerHTML = restoreHTML
@@ -57,3 +67,21 @@ function enableControls(target, $container, handler) {
     target.disabled = false
     $container.addEventListener('click', handler)
 }
+
+function updateCartModal() {
+    cartModalBody.innerHTML = '';
+    if (cartItems.length > 0) {
+        cartItems.forEach((item) => {
+            const cartItemElement = document.createElement('div');
+            cartItemElement.innerHTML = `${item.title} - $${item.price}`;
+            cartModalBody.appendChild(cartItemElement);
+        });
+    } else {
+        cartModalBody.innerHTML = 'No items in the cart';
+    }
+}
+
+document.querySelector('.page-header__cart-btn').addEventListener('click', () => {
+    updateCartModal();
+    cartModal.show();
+});
