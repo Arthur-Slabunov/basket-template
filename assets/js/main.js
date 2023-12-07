@@ -4,7 +4,6 @@ const cartModalBody = document.querySelector('#cartModalBody');
 const cartModal = new bootstrap.Modal(document.getElementById('cartModal'));
 const clearCartBtn = document.getElementById('clearCartBtn');
 
-
 let cartCounter = 0
 let cartPrice = 0
 let cartItems = [];
@@ -20,7 +19,10 @@ const btnClickHandler = (e) => {
     const itemTitle = target.closest('.item-wrapper').querySelector('.item-title').textContent;
     const itemPrice = getMockData(target);
 
-    const itemData = { title: itemTitle, price: itemPrice };
+    const itemData = {
+        title: itemTitle,
+        price: itemPrice
+    };
 
     const existingItemIndex = cartItems.findIndex((item) => item.title === itemData.title);
 
@@ -129,7 +131,6 @@ function removeItemFromCart(index) {
 function calculateTotalPrice(items) {
     return items.reduce((total, item) => total + item.price, 0);
 }
-
 
 document.querySelector('.page-header__cart-btn').addEventListener('click', () => {
     updateCartModal();
