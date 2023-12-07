@@ -11,7 +11,7 @@ let cartItems = [];
 
 const btnClickHandler = (e) => {
     const target = e.target
-    const interval = 2000
+    const interval = 1000
     let restoreHTML = null
 
     if (typeof target !== 'object') return
@@ -22,17 +22,24 @@ const btnClickHandler = (e) => {
 
     const itemData = { title: itemTitle, price: itemPrice };
 
-    incrementCounter(cartCounterLabel, ++cartCounter)
-    cartPrice = getPrice(target, cartPrice)
-    restoreHTML = target.innerHTML
-    target.innerHTML = `Added ${cartPrice} $`
-    disableControls(target, contentContainer, btnClickHandler)
+    const existingItemIndex = cartItems.findIndex((item) => item.title === itemData.title);
 
-    cartItems.push(itemData);
+    if (existingItemIndex !== -1) {
+        cartItems[existingItemIndex].quantity += 1;
+    } else {
+        itemData.quantity = 1;
+        cartItems.push(itemData);
+    }
+
+    incrementCounter(cartCounterLabel, ++cartCounter);
+    cartPrice = getPrice(target, cartPrice);
+    restoreHTML = target.innerHTML;
+    target.innerHTML = `Added ${cartPrice} $`;
+    disableControls(target, contentContainer, btnClickHandler);
 
     setTimeout(() => {
-        target.innerHTML = restoreHTML
-        enableControls(target, contentContainer, btnClickHandler)
+        target.innerHTML = restoreHTML;
+        enableControls(target, contentContainer, btnClickHandler);
     }, interval);
 }
 
@@ -67,8 +74,7 @@ function getMockData(target) {
 }
 
 function getPrice(target, price) {
-    return cartPrice = Math.round((cartPrice + getMockData(target)) * 100) / 100
-
+    return newPrice = Math.round((price + getMockData(target)) * 100) / 100;
 }
 
 function disableControls(target, $container, handler) {
@@ -89,14 +95,13 @@ function updateCartModal() {
         cartItems.forEach((item, index) => {
             const cartItemElement = document.createElement('div');
             cartItemElement.innerHTML = `
-          ${item.title} - $${item.price}
+          ${item.title} - Quantity : ${item.quantity} - $${item.price * item.quantity * 100 / 100}
           <button type="button" class="btn btn-outline-danger btn-sm remove-item-btn" data-index="${index}">
             <i class="fas fa-times"></i>
           </button>`;
             cartModalBody.appendChild(cartItemElement);
         });
 
-        // Add event listeners for the "Remove" buttons
         const removeButtons = document.querySelectorAll('.remove-item-btn');
         removeButtons.forEach((button) => {
             button.addEventListener('click', (event) => {
@@ -110,18 +115,14 @@ function updateCartModal() {
 }
 
 function removeItemFromCart(index) {
-    // Remove the item from the cartItems array based on the index
     cartItems.splice(index, 1);
 
-    // Update the cart counter and price
     cartCounter = cartItems.length;
     cartPrice = calculateTotalPrice(cartItems);
 
-    // Update the cart counter label
     cartCounterLabel.innerHTML = cartCounter;
     cartCounterLabel.style.display = cartCounter > 0 ? 'block' : 'none';
 
-    // Update the cart modal content
     updateCartModal();
 }
 
