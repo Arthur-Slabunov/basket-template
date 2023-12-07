@@ -2,6 +2,8 @@ const contentContainer = document.querySelector('#content-container')
 const cartCounterLabel = document.querySelector('#cart-counter-label')
 const cartModalBody = document.querySelector('#cartModalBody');
 const cartModal = new bootstrap.Modal(document.getElementById('cartModal'));
+const clearCartBtn = document.getElementById('clearCartBtn');
+
 
 let cartCounter = 0
 let cartPrice = 0
@@ -35,6 +37,19 @@ const btnClickHandler = (e) => {
 }
 
 contentContainer.addEventListener('click', btnClickHandler)
+
+clearCartBtn.addEventListener('click', () => {
+    cartItems = [];
+    cartCounter = 0;
+    cartPrice = 0;
+
+    cartCounterLabel.innerHTML = '0';
+    cartCounterLabel.style.display = 'none';
+
+    updateCartModal();
+
+    cartModal.hide();
+});
 
 function incrementCounter($label, counter) {
     $label.innerHTML = counter
