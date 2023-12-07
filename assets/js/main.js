@@ -86,15 +86,49 @@ function enableControls(target, $container, handler) {
 function updateCartModal() {
     cartModalBody.innerHTML = '';
     if (cartItems.length > 0) {
-        cartItems.forEach((item) => {
+        cartItems.forEach((item, index) => {
             const cartItemElement = document.createElement('div');
-            cartItemElement.innerHTML = `${item.title} - $${item.price}`;
+            cartItemElement.innerHTML = `
+          ${item.title} - $${item.price}
+          <button type="button" class="btn btn-outline-danger btn-sm remove-item-btn" data-index="${index}">
+            <i class="fas fa-times"></i>
+          </button>`;
             cartModalBody.appendChild(cartItemElement);
+        });
+
+        // Add event listeners for the "Remove" buttons
+        const removeButtons = document.querySelectorAll('.remove-item-btn');
+        removeButtons.forEach((button) => {
+            button.addEventListener('click', (event) => {
+                const indexToRemove = parseInt(event.target.dataset.index, 10);
+                removeItemFromCart(indexToRemove);
+            });
         });
     } else {
         cartModalBody.innerHTML = 'No items in the cart';
     }
 }
+
+function removeItemFromCart(index) {
+    // Remove the item from the cartItems array based on the index
+    cartItems.splice(index, 1);
+
+    // Update the cart counter and price
+    cartCounter = cartItems.length;
+    cartPrice = calculateTotalPrice(cartItems);
+
+    // Update the cart counter label
+    cartCounterLabel.innerHTML = cartCounter;
+    cartCounterLabel.style.display = cartCounter > 0 ? 'block' : 'none';
+
+    // Update the cart modal content
+    updateCartModal();
+}
+
+function calculateTotalPrice(items) {
+    return items.reduce((total, item) => total + item.price, 0);
+}
+
 
 document.querySelector('.page-header__cart-btn').addEventListener('click', () => {
     updateCartModal();
